@@ -1,38 +1,81 @@
-/*
-  To rename this template please do the following simple steps
-
-  1. Update the properties in this file in the designated section
-  2. In settings.gradle, change the name from "APlugin" to your project name
-  3. Use SHIFT+F6 on the package pkg (in src/java/main) to your package
-  4. Use SHIFT+F6 on the class APlugin (in src/main/java) to your project name
-  5. Update the getTag() function in the main plugin class to your project name
-  6. Invalidate Caches/Restart (Because JetBricks RetardiJ caching sucks)
- */
-
 plugins {
     id 'java'
+    id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
-// ========== Update Properties ==========
+//////////////////////////////////////////////////////////////////////////////////////////////
+// ========== Properties ==========
 group 'org.example'
 version '1.0'
 String main = 'pkg.APlugin'
 String author = 'cyberpwn'
 String description = 'An example Shuriken Plugin'
-// ========== ----------------- ==========
+String pluginsFolder = "C:\\Users\\cyberpwn\\Documents\\development\\server\\plugins";
 
-repositories {
-    mavenCentral()
-    maven {
-        url = "http://repo.volmit.com/repository/volmit/"
-    }
-}
-
-processResources {
-    expand(version: version, name: project.name, main: main, author: author, description: description)
-}
-
+// ========== Dependencies ==========
 dependencies {
     implementation 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
     implementation 'ninja.bytecode.shuriken:shuriken-bukkit:2.0.6'
+
+    // You can implement libraries as classpath only if they are already on mc servers
+    // implementation 'some:library:2.2.3'
+
+    // You can shade libraries into your output jar using this
+    // shade 'some:library:2.2.3'
+}
+
+
+// ========== Repositories ==========
+repositories {
+    maven {
+        // Most repositories are mirrored and cached in volmit.
+        // If you would like us to cache your repository or one you need
+        // Send a message to cyberpwn#1337 on discord about it, happy to proxy!
+        url = "http://repo.volmit.com/repository/volmit/"
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+// ========== Internal configurations ==========
+boolean dev = true;
+String archiveName = rootProject.version + "-" + rootProject.version + ".jar"
+String archiveNameDev = rootProject.version + "-dev.jar"
+String archivePath = dev ? pluginsFolder : jar.archiveFile.get().getAsFile().getParentFile().getAbsolutePath() + "\\" + project.version
+String archiveFilePath = archivePath + "\\" + archiveNameDev
+String archiveFilePathRelease = archivePath + "\\" + archiveName
+
+// Configuration for shading your plugin's dependencies but not implementations
+configurations {
+    shade.extendsFrom implemetation
+}
+
+shadowJar {
+    zip64 true
+    minimize()
+    configurations = [project.configurations.shade]
+    archiveFileName = dev ? archiveFilePath : archiveFilePathRelease
+}
+
+// You can filter additional resources through the plugin.yml here
+processResources {
+    expand(
+        version: version,
+        name: project.name,
+        main: main,
+        author: author,
+        description: description
+    )
+}
+
+task jarRelease {
+    group 'shuriken'
+    dependsOn 'shadowJar'
+    doLast {
+        dev = false;
+    }
+}
+
+task jarDevelopment {
+    group 'shuriken'
+    dependsOn 'shadowJar'
 }
