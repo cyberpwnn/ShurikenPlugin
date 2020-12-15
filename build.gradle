@@ -1,0 +1,38 @@
+/*
+  To rename this template please do the following simple steps
+
+  1. Update the properties in this file in the designated section
+  2. In settings.gradle, change the name from "APlugin" to your project name
+  3. Use SHIFT+F6 on the package pkg (in src/java/main) to your package
+  4. Use SHIFT+F6 on the class APlugin (in src/main/java) to your project name
+  5. Update the getTag() function in the main plugin class to your project name
+  6. Invalidate Caches/Restart (Because JetBricks RetardiJ caching sucks)
+ */
+
+plugins {
+    id 'java'
+}
+
+// ========== Update Properties ==========
+group 'org.example'
+version '1.0'
+String main = 'pkg.APlugin'
+String author = 'cyberpwn'
+String description = 'An example Shuriken Plugin'
+// ========== ----------------- ==========
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "http://repo.volmit.com/repository/volmit/"
+    }
+}
+
+processResources {
+    expand(version: version, name: project.name, main: main, author: author, description: description)
+}
+
+dependencies {
+    implementation 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    implementation 'ninja.bytecode.shuriken:shuriken-bukkit:2.0.6'
+}
