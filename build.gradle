@@ -3,6 +3,11 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
+// Configuration for shading your plugin's dependencies but not implementations
+configurations {
+    shade.extendsFrom implemetation
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 // ========== Properties ==========
 group 'org.example'
@@ -22,6 +27,8 @@ dependencies {
 
     // You can shade libraries into your output jar using this
     // shade 'some:library:2.2.3'
+    shade group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+
 }
 
 
@@ -37,24 +44,23 @@ repositories {
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // ========== Internal configurations ==========
-boolean dev = true;
-String archiveName = rootProject.version + "-" + rootProject.version + ".jar"
-String archiveNameDev = rootProject.version + "-dev.jar"
-String archivePath = dev ? pluginsFolder : jar.archiveFile.get().getAsFile().getParentFile().getAbsolutePath() + "\\" + project.version
-String archiveFilePath = archivePath + "\\" + archiveNameDev
-String archiveFilePathRelease = archivePath + "\\" + archiveName
+void configureShadow(boolean dev, String pluginsFolder)
+{
+    String archiveName = rootProject.name + "-" + rootProject.version + ".jar"
+    String archiveNameDev = rootProject.name + "-dev.jar"
+    String archivePath = dev ? pluginsFolder : project.getRootDir().getAbsolutePath() + "\\release\\" + project.version
+    String archiveFilePath = archivePath + "\\" + archiveNameDev
+    String archiveFilePathRelease = archivePath + "\\" + archiveName
 
-// Configuration for shading your plugin's dependencies but not implementations
-configurations {
-    shade.extendsFrom implemetation
+    shadowJar {
+        zip64 true
+        minimize()
+        configurations = [project.configurations.shade]
+        archiveFileName = dev ? archiveFilePath : archiveFilePathRelease
+    }
 }
 
-shadowJar {
-    zip64 true
-    minimize()
-    configurations = [project.configurations.shade]
-    archiveFileName = dev ? archiveFilePath : archiveFilePathRelease
-}
+configureShadow(true, pluginsFolder)
 
 // You can filter additional resources through the plugin.yml here
 processResources {
@@ -67,12 +73,16 @@ processResources {
     )
 }
 
+task preRelease {
+    group 'other'
+    doLast{
+        configureShadow(false, pluginsFolder)
+    }
+}
+
 task jarRelease {
     group 'shuriken'
     dependsOn 'shadowJar'
-    doLast {
-        dev = false;
-    }
 }
 
 task jarDevelopment {

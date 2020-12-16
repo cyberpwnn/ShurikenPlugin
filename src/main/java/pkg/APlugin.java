@@ -1,5 +1,6 @@
 package pkg;
 
+import com.google.gson.GsonBuilder;
 import ninja.bytecode.shuriken.bukkit.bukkit.plugin.Instance;
 import ninja.bytecode.shuriken.bukkit.bukkit.plugin.ShurikenPlugin;
 import ninja.bytecode.shuriken.bukkit.util.text.C;
@@ -12,7 +13,7 @@ public class APlugin extends ShurikenPlugin {
     @Override
     public void start()
     {
-
+        new GsonBuilder();
     }
 
     @Override
