@@ -1,10 +1,15 @@
 package pkg;
 
 import com.google.gson.GsonBuilder;
+import lombok.Data;
+import ninja.bytecode.shuriken.bukkit.api.world.Area;
+import ninja.bytecode.shuriken.bukkit.api.world.Explosion;
 import ninja.bytecode.shuriken.bukkit.bukkit.plugin.Instance;
 import ninja.bytecode.shuriken.bukkit.bukkit.plugin.ShurikenPlugin;
 import ninja.bytecode.shuriken.bukkit.util.text.C;
 import ninja.bytecode.shuriken.bukkit.util.text.TXT;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Donkey;
 
 public class APlugin extends ShurikenPlugin {
     @Instance
