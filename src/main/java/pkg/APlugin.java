@@ -11,9 +11,8 @@ public class APlugin extends ShurikenPlugin {
     public static APlugin instance;
 
     @Override
-    public void start()
-    {
-        new GsonBuilder();
+    public void start() {
+
     }
 
     @Override
